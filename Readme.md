@@ -1,4 +1,4 @@
-**Unfortunately I don't use Telegram anymore and won't be providing updates for this, however, I'll still accept PRs.**
+**Forked from onedr0p/telegram-sonarr-bot I¡ll try to update this fork, but I havent some time**
 
 # telegram-sonarr-bot
 
