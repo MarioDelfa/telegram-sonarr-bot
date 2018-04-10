@@ -1,4 +1,4 @@
-**Forked from onedr0p/telegram-sonarr-bot I¡ll try to update this fork, but I havent some time**
+**Forked from onedr0p/telegram-sonarr-bot I'll try to update this fork, but I havent some time**
 
 # telegram-sonarr-bot
 
