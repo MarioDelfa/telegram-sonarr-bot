@@ -6,12 +6,13 @@ var fs          = require('fs');                        // https://nodejs.org/ap
 var _           = require('lodash');                    // https://www.npmjs.com/package/lodash
 var NodeCache   = require('node-cache');                // https://www.npmjs.com/package/node-cache
 var TelegramBot = require('node-telegram-bot-api');     // https://www.npmjs.com/package/node-telegram-bot-api
-const TelegrafBot = require('telegraf';)                // https://github.com/telegraf/telegraf
+const TelegrafBot = require('telegraf');                // https://github.com/telegraf/telegraf
 
 /*
  * libs
  */
 var i18n   = require(__dirname + '/lib/lang');          // set up multilingual support
+const TelegrafI18n = require('telegraf-i18n');          // https://github.com/telegraf/telegraf-i18n
 var config = require(__dirname + '/lib/config');        // the concised configuration
 var state  = require(__dirname + '/lib/state');         // handles command structure
 var logger = require(__dirname + '/lib/logger');        // logs to file and console
@@ -21,18 +22,24 @@ var acl    = require(__dirname + '/lib/acl');           // set up the acl file
  * modules
  */
 var SonarrMessage = require(__dirname + '/modules/SonarrMessage');
+const path = require('path');
 
 /*
  * modules
  */
 i18n.setLocale(config.bot.lang);
+const tlgfi18n = new TelegrafI18n({
+    useSession: true,
+    directory: path.resolve(__dirname, 'locales')
+});
 
 /*
  * set up the telegram bot
  */
 var bot = new TelegramBot(config.telegram.botToken, { polling: true });
 
-const tlgfBot = new Telegraf(config.telegram.botToken);
+const tlgfBot = new TelegrafBot(config.telegram.botToken);
+
 
 
 /*
@@ -74,7 +81,7 @@ tlgfBot.command('start', (ctx)=>{
 
     verifyUser(fromId);
 
-    logger.info('[NEW]'i18n.__('logUserStartCommand'), fromId);
+    logger.info('[NEW]'+ i18n.__('logUserStartCommand'), fromId);
 
     sendCommands(fromId);
 });
@@ -862,3 +869,5 @@ function sendCommands(fromId) {
   //return bot.sendMessage(fromId, response.join('\n'), { 'parse_mode': 'Markdown', 'selective': 2 });
     return bot.sendMessage(fromId, response.join('\n'));
 }
+
+tlgfBot.startPolling();

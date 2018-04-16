@@ -13,6 +13,7 @@
     "request": "^2.67.0",
     "sonarr-api": "^0.1.2",
     "telegraf": "^3.20.0",
+    "telegraf-i18n": "^6.0.4",
     "winston": "^2.1.1"
   },
   "devDependencies": {
