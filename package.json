@@ -14,6 +14,9 @@
     "sonarr-api": "^0.1.2",
     "winston": "^2.1.1"
   },
+  "devDependencies": {
+      "eslint": "^4.19.1"
+  },
   "repository": "git://github.com/onedr0p/telegram-sonarr-bot",
   "keywords": [
     "sonarr",
