@@ -6,8 +6,11 @@ var i18n   = require(__dirname + '/lib/lang');
 var logger = require(__dirname + '/lib/logger');
 var config = require(__dirname + '/lib/config');
 var TelegramBot = require('node-telegram-bot-api');
+var TelegrafBot = require('Telegraf');
 
 var bot = new TelegramBot(config.telegram.botToken, { polling: false });
+// I dont know the reason for use the bot here, but I'll going to leave here for now.
+const botTelegraf = new TelegrafBot(config.telegram.botToken);
 
 var groupId = config.bot.notifyId;
 

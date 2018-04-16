@@ -6,6 +6,7 @@ var fs          = require('fs');                        // https://nodejs.org/ap
 var _           = require('lodash');                    // https://www.npmjs.com/package/lodash
 var NodeCache   = require('node-cache');                // https://www.npmjs.com/package/node-cache
 var TelegramBot = require('node-telegram-bot-api');     // https://www.npmjs.com/package/node-telegram-bot-api
+const TelegrafBot = require('telegraf';)                // https://github.com/telegraf/telegraf
 
 /*
  * libs
@@ -31,6 +32,9 @@ i18n.setLocale(config.bot.lang);
  */
 var bot = new TelegramBot(config.telegram.botToken, { polling: true });
 
+const tlgfBot = new Telegraf(config.telegram.botToken);
+
+
 /*
  * set up a simple caching tool
  */
@@ -41,6 +45,13 @@ var cache = new NodeCache({ stdTTL: 120, checkperiod: 150 });
  */
 bot.getMe().then(function(msg) {
   logger.info(i18n.__('logBotInitialisation'), msg.username);
+})
+.catch(function(err) {
+  throw new Error(err);
+});
+
+tlgfBot.telegram.getMe().then(function(msg) {
+  logger.info('[NEW] '+i18n.__('logBotInitialisation'), msg.username);
 })
 .catch(function(err) {
   throw new Error(err);
@@ -58,6 +69,16 @@ bot.onText(/\/start/, function(msg) {
   sendCommands(fromId);
 });
 
+tlgfBot.command('start', (ctx)=>{
+    var fromId = ctx.from.id;
+
+    verifyUser(fromId);
+
+    logger.info('[NEW]'i18n.__('logUserStartCommand'), fromId);
+
+    sendCommands(fromId);
+});
+
 /*
  * handle help command
  */
@@ -67,6 +88,15 @@ bot.onText(/\/help/, function(msg) {
   verifyUser(fromId);
 
   logger.info(i18n.__('logUserHelpCommand', fromId));
+  sendCommands(fromId);
+});
+
+tlgfBot.command('help', (ctx) => {
+  var fromId = ctx.from.id;
+  
+  verifyUser(fromId);
+
+  logger.info('[NEW]' + i18n.__('logUserHelpCommand', fromId));
   sendCommands(fromId);
 });
 
@@ -207,6 +237,146 @@ bot.on('message', function(msg) {
   }
 
 });
+
+tlgfBot.on('message',(ctx) => {
+  var user    = ctx.from;
+  var message = ctx.message;
+ 
+  var sonarr = new SonarrMessage(tlgfBot, user, cache);
+
+  logger.info('[NEW] message');
+
+  if (/^\/library\s?(.+)?$/g.test(message)) {
+    if(isAuthorized(user.id)){
+       var searchText = /^\/library\s?(.+)?/g.exec(message)[1] || null;
+       return sonarr.performLibrarySearch(searchText);
+    } else {
+       return replyWithError(user.id, new Error(i18n.__('notAuthorized')));
+    }
+  }
+
+  if(/^\/rss$/g.test(message)) {
+    verifyAdmin(user.id);
+    if(isAdmin(user.id)){
+      return sonarr.performRssSync();
+    }  
+  }
+
+  if(/^\/wanted$/g.test(message)) {
+    verifyAdmin(user.id);
+    if(isAdmin(user.id)){
+      return sonarr.performWantedSearch();
+    }
+  }
+
+  if(/^\/refresh$/g.test(message)) {
+    verifyAdmin(user.id);
+    if(isAdmin(user.id)){
+      return sonarr.performLibraryRefresh();
+    }
+  }
+
+  if (/^\/upcoming\s?(\d+)?$/g.test(message)) {
+    if(isAuthorized(user.id)){
+      var futureDays = /^\/upcoming\s?(\d+)?/g.exec(message)[1] || 3;
+      return sonarr.performCalendarSearch(futureDays);
+    } else {
+       return replyWithError(user.id, new Error(i18n.__('notAuthorized')));
+    }
+  }
+
+  /*
+   * /cid command
+   * Gets the current chat id
+   * Used for configuring notifications and similar tasks
+   */
+  if (/^\/cid$/g.test(message)) {
+    verifyAdmin(user.id);
+    logger.info('[NEW]' + i18n.__('logUserCidCommand', user.id, msg.chat.id));
+    return bot.sendMessage(msg.chat.id, i18n.__('botChatCid', msg.chat.id));
+  }
+
+
+  /*
+   * /query command
+   */
+  if (/^\/[Qq](uery)? (.+)$/g.test(message)) {
+    if(isAuthorized(user.id)){
+       var seriesName = /^\/[Qq](uery)? (.+)/g.exec(message)[2] || null;
+       return sonarr.sendSeriesList(seriesName);
+    } else {
+       return replyWithError(user.id, new Error(i18n.__('notAuthorized')));     
+    }
+  }
+
+  // get the current cache state
+  var currentState = cache.get('state' + user.id);
+
+  if (currentState === state.admin.REVOKE) {
+    verifyUser(user.id);
+    return handleRevokeUser(user.id, message);
+  }
+
+  if (currentState === state.admin.REVOKE_CONFIRM) {
+    verifyUser(user.id);
+    return handleRevokeUserConfirm(user.id, message);
+  }
+
+  if (currentState === state.admin.UNREVOKE) {
+    verifyUser(user.id);
+    return handleUnRevokeUser(user.id, message);
+  }
+
+  if (currentState === state.admin.UNREVOKE_CONFIRM) {
+    verifyUser(user.id);
+    return handleUnRevokeUserConfirm(user.id, message);
+  }
+
+  if (currentState === state.sonarr.CONFIRM) {
+    verifyUser(user.id);
+    logger.info('[NEW]' + i18n.__('botChatQuerySeriesConfirm', user.id, message));
+    return sonarr.confirmShowSelect(message);
+  }
+
+  if (currentState === state.sonarr.PROFILE) {
+    verifyUser(user.id);
+    logger.info('[NEW]' + i18n.__('botChatQuerySeriesChoose', user.id, message));
+    return sonarr.sendProfileList(message);
+  }
+
+  if (currentState === state.sonarr.MONITOR) {
+    verifyUser(user.id);
+    logger.info('[NEW]' + i18n.__('botChatQueryProfileChoose', user.id, message));
+    return sonarr.sendMonitorList(message);
+  }
+
+  if (currentState === state.sonarr.TYPE) {
+    verifyUser(user.id);
+    logger.info('[NEW]' + i18n.__('botChatQueryTypeChoose', user.id, message));
+    return sonarr.sendTypeList(message);
+  }
+
+  if (currentState === state.sonarr.FOLDER) {
+    verifyUser(user.id);
+    logger.info('[NEW]' + i18n.__('botChatQueryFolderChoose', user.id, message));
+    return sonarr.sendFolderList(message);
+  }
+
+  if (currentState === state.sonarr.SEASON_FOLDER) {
+    verifyUser(user.id);
+    logger.info('[NEW]' + i18n.__('botChatQuerySeasonFolderChoose', user.id, message));
+    return sonarr.sendSeasonFolderList(message);
+  }
+
+  if (currentState === state.sonarr.ADD_SERIES) {
+    verifyUser(user.id);
+    return sonarr.sendAddSeries(message);
+  }
+
+});
+
+
+
 
 /*
  * handle authorization
