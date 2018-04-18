@@ -19,7 +19,7 @@
   "devDependencies": {
     "eslint": "^4.19.1"
   },
-  "repository": "git://github.com/onedr0p/telegram-sonarr-bot",
+  "repository": "git://github.com/MarioDelfa/telegram-sonarr-bot",
   "keywords": [
     "sonarr",
     "telegram"

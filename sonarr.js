@@ -7,12 +7,12 @@ var _           = require('lodash');                    // https://www.npmjs.com
 var NodeCache   = require('node-cache');                // https://www.npmjs.com/package/node-cache
 var TelegramBot = require('node-telegram-bot-api');     // https://www.npmjs.com/package/node-telegram-bot-api
 const TelegrafBot = require('telegraf');                // https://github.com/telegraf/telegraf
+const TelegrafI18n = require('telegraf-i18n');          // https://github.com/telegraf/telegraf-i18n
 
 /*
  * libs
  */
 var i18n   = require(__dirname + '/lib/lang');          // set up multilingual support
-const TelegrafI18n = require('telegraf-i18n');          // https://github.com/telegraf/telegraf-i18n
 var config = require(__dirname + '/lib/config');        // the concised configuration
 var state  = require(__dirname + '/lib/state');         // handles command structure
 var logger = require(__dirname + '/lib/logger');        // logs to file and console
@@ -50,12 +50,12 @@ var cache = new NodeCache({ stdTTL: 120, checkperiod: 150 });
 /*
  * get the bot name
  */
-bot.getMe().then(function(msg) {
-  logger.info(i18n.__('logBotInitialisation'), msg.username);
-})
-.catch(function(err) {
-  throw new Error(err);
-});
+// bot.getMe().then(function(msg) {
+//   logger.info(i18n.__('logBotInitialisation'), msg.username);
+// })
+// .catch(function(err) {
+//   throw new Error(err);
+// });
 
 tlgfBot.telegram.getMe().then(function(msg) {
   logger.info('[NEW] '+i18n.__('logBotInitialisation'), msg.username);
@@ -67,14 +67,14 @@ tlgfBot.telegram.getMe().then(function(msg) {
 /*
  * handle start command
  */
-bot.onText(/\/start/, function(msg) {
-  var fromId = msg.from.id;
+// bot.onText(/\/start/, function(msg) {
+//   var fromId = msg.from.id;
 
-  verifyUser(fromId);
+//   verifyUser(fromId);
 
-  logger.info(i18n.__('logUserStartCommand'), fromId);
-  sendCommands(fromId);
-});
+//   logger.info(i18n.__('logUserStartCommand'), fromId);
+//   sendCommands(fromId);
+// });
 
 tlgfBot.command('start', (ctx)=>{
     var fromId = ctx.from.id;
@@ -83,7 +83,7 @@ tlgfBot.command('start', (ctx)=>{
 
     logger.info('[NEW]'+ i18n.__('logUserStartCommand'), fromId);
 
-    sendCommands(fromId);
+    sendCommandsTlgf(ctx);
 });
 
 /*
@@ -104,7 +104,7 @@ tlgfBot.command('help', (ctx) => {
   verifyUser(fromId);
 
   logger.info('[NEW]' + i18n.__('logUserHelpCommand', fromId));
-  sendCommands(fromId);
+  sendCommandsTlgf(ctx);
 });
 
 /*
@@ -258,7 +258,7 @@ tlgfBot.on('message',(ctx) => {
        var searchText = /^\/library\s?(.+)?/g.exec(message)[1] || null;
        return sonarr.performLibrarySearch(searchText);
     } else {
-       return replyWithError(user.id, new Error(i18n.__('notAuthorized')));
+       return replyWithErrorTlgf(user.id, new Error(i18n.__('notAuthorized')));
     }
   }
 
@@ -288,7 +288,7 @@ tlgfBot.on('message',(ctx) => {
       var futureDays = /^\/upcoming\s?(\d+)?/g.exec(message)[1] || 3;
       return sonarr.performCalendarSearch(futureDays);
     } else {
-       return replyWithError(user.id, new Error(i18n.__('notAuthorized')));
+       return replyWithErrorTlgf(user.id, new Error(i18n.__('notAuthorized')));
     }
   }
 
@@ -312,7 +312,7 @@ tlgfBot.on('message',(ctx) => {
        var seriesName = /^\/[Qq](uery)? (.+)/g.exec(message)[2] || null;
        return sonarr.sendSeriesList(seriesName);
     } else {
-       return replyWithError(user.id, new Error(i18n.__('notAuthorized')));     
+       return replyWithErrorTlgf(user.id, new Error(i18n.__('notAuthorized')));     
     }
   }
 
@@ -806,6 +806,11 @@ function replyWithError(userId, err) {
   });
 }
 
+function replyWithErrorTlgf(userId, err) {
+    logger.warn('[New]' + i18n.__('logWarnError', userId, err.message));
+
+    replyWithMarkdown(i18n.__('botChatErrorFormat', err));
+  }
 /*
  * clear caches
  */
@@ -868,6 +873,36 @@ function sendCommands(fromId) {
 
   //return bot.sendMessage(fromId, response.join('\n'), { 'parse_mode': 'Markdown', 'selective': 2 });
     return bot.sendMessage(fromId, response.join('\n'));
+}
+/*
+ * Send Commands To chat
+ */
+function sendCommandsTlgf(ctx) {
+    var fromId = ctx.from.id;
+  var response = ['[NEW] Hello ' + getTelegramName(fromId) + '!'];
+  response.push(i18n.__('botChatHelp_1'));
+  response.push(i18n.__('botChatHelp_2'));
+  response.push(i18n.__('botChatHelp_3'));
+  response.push(i18n.__('botChatHelp_4'));
+  response.push(i18n.__('botChatHelp_5'));
+  response.push(i18n.__('botChatHelp_6'));
+  response.push(i18n.__('botChatHelp_7'));
+  response.push(i18n.__('botChatHelp_8'));
+
+  if (isAdmin(fromId)) {
+    response.push(i18n.__('botChatHelp_9'));
+    response.push(i18n.__('botChatHelp_10'));
+    response.push(i18n.__('botChatHelp_11'));
+    response.push(i18n.__('botChatHelp_12'));
+    response.push(i18n.__('botChatHelp_13'));
+    response.push(i18n.__('botChatHelp_14'));
+    response.push(i18n.__('botChatHelp_15'));
+  }
+
+  //return bot.sendMessage(fromId, response.join('\n'), { 'parse_mode': 'Markdown', 'selective': 2 });
+    // return bot.sendMessage(fromId, response.join('\n'));
+    // return ctx.reply(response.join('\n'))
+    replyWithMarkdown(response.join('\n'));
 }
 
 tlgfBot.startPolling();
