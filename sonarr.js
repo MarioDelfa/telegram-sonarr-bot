@@ -905,4 +905,4 @@ function sendCommandsTlgf(ctx) {
     replyWithMarkdown(response.join('\n'));
 }
 
-tlgfBot.startPolling();
+//tlgfBot.startPolling();
