@@ -4,3 +4,4 @@ config.json
 acl.json
 sonarr.log
 nbproject/
+.vscode/launch.json
