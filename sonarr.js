@@ -7,6 +7,7 @@ var _           = require('lodash');                    // https://www.npmjs.com
 var NodeCache   = require('node-cache');                // https://www.npmjs.com/package/node-cache
 var TelegramBot = require('node-telegram-bot-api');     // https://www.npmjs.com/package/node-telegram-bot-api
 const TelegrafBot = require('telegraf');                // https://github.com/telegraf/telegraf
+const commandParts = require('telegraf-command-parts');                // https://github.com/telegraf/telegraf
 
 /*
  * libs
@@ -39,6 +40,7 @@ const tlgfi18n = new TelegrafI18n({
 var bot = new TelegramBot(config.telegram.botToken, { polling: false });
 
 const tlgfBot = new TelegrafBot(config.telegram.botToken);
+tlgfBot.use(commandParts());
 
 
 
