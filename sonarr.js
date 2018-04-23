@@ -52,12 +52,12 @@ var cache = new NodeCache({ stdTTL: 120, checkperiod: 150 });
 /*
  * get the bot name
  */
-bot.getMe().then(function(msg) {
-  logger.info(i18n.__('logBotInitialisation'), msg.username);
-})
-.catch(function(err) {
-  throw new Error(err);
-});
+// bot.getMe().then(function(msg) {
+//   logger.info(i18n.__('logBotInitialisation'), msg.username);
+// })
+// .catch(function(err) {
+//   throw new Error(err);
+// });
 
 tlgfBot.telegram.getMe().then(function(msg) {
   logger.info('[NEW] '+i18n.__('logBotInitialisation'), msg.username);
@@ -121,14 +121,10 @@ tlgfBot.command('start', (ctx)=>{
 
 //   return bot.sendMessage(fromId, message.join('\n'));
 // });
-tlgfBot.command('/auth', (ctx) => {
-  var fromId = ctx.from.id;
-  logger.info('[TRAZA]1 ' + ctx.match);
-  logger.info('[TRAZA]2 ' + ctx);
-  if ( ctx.match === undefined){
-    return replyWithError(fromId, new Error(i18n.__('errorInvalidPassowrd')));
-  }
-  var password = ctx.match[1];
+tlgfBot.command('auth', (ctx) => {
+  var msg = ctx;
+  var fromId = msg.from.id;
+  var password = ctx.state.args;
 
   var message = [];
 
@@ -173,14 +169,14 @@ tlgfBot.command('/auth', (ctx) => {
 /*
  * handle help command
  */
-bot.onText(/\/help/, function(msg) {
-  var fromId = msg.from.id;
+// bot.onText(/\/help/, function(msg) {
+//   var fromId = msg.from.id;
   
-  verifyUser(fromId);
+//   verifyUser(fromId);
 
-  logger.info(i18n.__('logUserHelpCommand', fromId));
-  sendCommands(fromId);
-});
+//   logger.info(i18n.__('logUserHelpCommand', fromId));
+//   sendCommands(fromId);
+// });
 
 tlgfBot.command('help', (ctx) => {
   var fromId = ctx.from.id;
@@ -871,6 +867,7 @@ function clearCache(userId) {
  * get telegram name
  */
 function getTelegramName(user) {
+    logger.debug('[NEW] getTelegramName(' + user + ')');
   var lastname = '';
   if (typeof user === 'object') {
     lastname = (user.last_name !== undefined) ? ' ' + user.last_name : '';
