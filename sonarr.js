@@ -7,7 +7,7 @@ var _           = require('lodash');                    // https://www.npmjs.com
 var NodeCache   = require('node-cache');                // https://www.npmjs.com/package/node-cache
 var TelegramBot = require('node-telegram-bot-api');     // https://www.npmjs.com/package/node-telegram-bot-api
 const TelegrafBot = require('telegraf');                // https://github.com/telegraf/telegraf
-const commandParts = require('telegraf-command-parts');                // https://github.com/telegraf/telegraf
+const commandParts = require('telegraf-command-parts'); // https://github.com/telegraf/telegraf
 
 /*
  * libs
@@ -76,7 +76,7 @@ tlgfBot.command('start', (ctx)=>{
 
     logger.info('[NEW]'+ i18n.__('logUserStartCommand'), fromId);
 
-    sendCommands(fromId);
+    sendCommandsTlgf(fromId);
 });
 
 /*
@@ -131,18 +131,19 @@ tlgfBot.command('auth', (ctx) => {
   if (isAuthorized(fromId)) {
     message.push(i18n.__('botChatAuthAlreadyAuthorized_1'));
     message.push(i18n.__('botChatAuthAlreadyAuthorized_2'));
-    return bot.sendMessage(fromId, message.join('\n'));
+    replyWithMarkdown(message.join('\n'));
   }
 
   // make sure the user is not banned
   if (isRevoked(fromId)) {
     message.push(i18n.__('botChatAuthIsRevoked_1'));
     message.push(i18n.__('botChatAuthIsRevoked_2'));
-    return bot.sendMessage(fromId, message.join('\n'));
+    replyWithMarkdown(message.join('\n'));
   }
 
   if (password !== config.bot.password) {
-    return replyWithError(fromId, new Error(i18n.__('errorInvalidPassowrd')));
+    replyWithErrorTlgf(new Error(i18n.__('errorInvalidPassowrd')));
+    // return replyWithError(fromId, new Error(i18n.__('errorInvalidPassowrd')));
   }
 
   acl.allowedUsers.push(msg.from);
@@ -153,14 +154,13 @@ tlgfBot.command('auth', (ctx) => {
   }
 
   if (config.bot.owner) {
-    bot.sendMessage(config.bot.owner, i18n.__('botChatAuthUserWasGranted', getTelegramName(msg.from)));
+    tlgfBot.telegram.sendMessage(config.bot.owner, i18n.__('botChatAuthUserWasGranted', getTelegramName(msg.from)));
   }
 
   message.push(i18n.__('botChatAuthGranted_1'));
   message.push(i18n.__('botChatAuthGranted_2'));
 
-  return bot.sendMessage(fromId, message.join('\n'));
-  
+  replyWithMarkdown(message.join('\n'));
 });
 
 
@@ -184,7 +184,7 @@ tlgfBot.command('help', (ctx) => {
   verifyUser(fromId);
 
   logger.info('[NEW]' + i18n.__('logUserHelpCommand', fromId));
-  sendCommands(fromId);
+  sendCommandsTlgf(fromId);
 });
 
 /*
@@ -368,7 +368,7 @@ tlgfBot.on('message',(ctx) => {
       var futureDays = /^\/upcoming\s?(\d+)?/g.exec(message)[1] || 3;
       return sonarr.performCalendarSearch(futureDays);
     } else {
-       return replyWithError(user.id, new Error(i18n.__('notAuthorized')));
+      return replyWithErrorTlgf(new Error(i18n.__('notAuthorized')));
     }
   }
 
@@ -380,7 +380,8 @@ tlgfBot.on('message',(ctx) => {
   if (/^\/cid$/g.test(message)) {
     verifyAdmin(user.id);
     logger.info('[NEW]' + i18n.__('logUserCidCommand', user.id, msg.chat.id));
-    return bot.sendMessage(msg.chat.id, i18n.__('botChatCid', msg.chat.id));
+    replyWithMarkdown(i18n.__('botChatCid', msg.chat.id));
+    // return bot.sendMessage(msg.chat.id, i18n.__('botChatCid', msg.chat.id));
   }
 
 
@@ -844,6 +845,11 @@ function replyWithError(userId, err) {
   });
 }
 
+function replyWithErrorTlgf(userId, err) {
+  logger.warn('[New]' + i18n.__('logWarnError', userId, err.message));
+  replyWithMarkdown(i18n.__('botChatErrorFormat', err));
+}
+
 /*
  * clear caches
  */
@@ -867,7 +873,7 @@ function clearCache(userId) {
  * get telegram name
  */
 function getTelegramName(user) {
-    logger.debug('[NEW] getTelegramName(' + user + ')');
+  logger.debug('[NEW] getTelegramName(' + user + ')');
   var lastname = '';
   if (typeof user === 'object') {
     lastname = (user.last_name !== undefined) ? ' ' + user.last_name : '';
@@ -911,5 +917,33 @@ function sendCommands(fromId) {
     return bot.sendMessage(fromId, response.join('\n'));
 }
 
+
+/*
+ * Send Commands To chat
+ */
+function sendCommandsTlgf(ctx) {
+  var fromId = ctx.from.id;
+  var response = ['[NEW] Hello ' + getTelegramName(fromId) + '!'];
+  response.push(i18n.__('botChatHelp_1'));
+  response.push(i18n.__('botChatHelp_2'));
+  response.push(i18n.__('botChatHelp_3'));
+  response.push(i18n.__('botChatHelp_4'));
+  response.push(i18n.__('botChatHelp_5'));
+  response.push(i18n.__('botChatHelp_6'));
+  response.push(i18n.__('botChatHelp_7'));
+  response.push(i18n.__('botChatHelp_8'));
+
+  if (isAdmin(fromId)) {
+    response.push(i18n.__('botChatHelp_9'));
+    response.push(i18n.__('botChatHelp_10'));
+    response.push(i18n.__('botChatHelp_11'));
+    response.push(i18n.__('botChatHelp_12'));
+    response.push(i18n.__('botChatHelp_13'));
+    response.push(i18n.__('botChatHelp_14'));
+    response.push(i18n.__('botChatHelp_15'));
+  }
+
+    replyWithMarkdown(response.join('\n'));
+}
 
 tlgfBot.startPolling();
