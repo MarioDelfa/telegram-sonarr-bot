@@ -13,5 +13,10 @@ pipeline {
 '''
       }
     }
+    stage('arranque del bot') {
+      steps {
+        sh 'node sonarr.js'
+      }
+    }
   }
 }
