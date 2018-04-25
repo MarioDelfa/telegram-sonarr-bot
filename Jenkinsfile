@@ -2,12 +2,7 @@ pipeline {
   agent any
   stages {
     stage('Inicializacion') {
-      agent {
-        node {
-          label 'node-1.4'
-        }
-
-      }
+      agent any
       steps {
         sh '''npm install
 '''
