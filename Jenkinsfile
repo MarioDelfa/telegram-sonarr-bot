@@ -2,10 +2,21 @@ pipeline {
   agent any
   stages {
     stage('Inicializacion') {
-      agent any
-      steps {
-        sh '''npm install
+      parallel {
+        stage('Inicializacion') {
+          agent any
+          steps {
+            sh '''npm install
 '''
+          }
+        }
+        stage('mensajes') {
+          steps {
+            echo 'Pasando por aqui'
+            sh 'echo $pwd'
+            fileExists 'confog.cfg'
+          }
+        }
       }
     }
     stage('arranque del bot') {
