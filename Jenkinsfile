@@ -13,7 +13,9 @@ pipeline {
         stage('mensajes') {
           steps {
             echo 'Pasando por aqui'
-            sh 'echo $pwd'
+            sh '''echo $pwd
+env
+echo whoami'''
             fileExists 'confog.cfg'
           }
         }
