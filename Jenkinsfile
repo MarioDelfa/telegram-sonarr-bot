@@ -19,16 +19,10 @@ echo whoami'''
             fileExists '/opt/sonarrbot/config.cfg'
           }
         }
-        stage('Verificacion-Fichero') {
+        stage('Copia') {
           steps {
-            waitUntil() {
-              fileExists '/opt/sonarrbot/sonar.js'
-            }
-
-            ws(dir: '/opt/sonarrbot') {
-              fileExists '/opt/sonarrbot/sonar.js'
-            }
-
+            sh '''mkdir /opt/sonarrbot
+cp -R * /opt/sonartbot'''
           }
         }
       }
