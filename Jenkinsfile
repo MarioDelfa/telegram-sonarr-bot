@@ -3,8 +3,7 @@ pipeline {
   stages {
     stage('Copia') {
       steps {
-        sh '''mkdir /opt/sonarrbot
-cp -R * /opt/sonartbot'''
+        sh 'mkdir /opt/sonarrbot'
       }
     }
     stage('arranque del bot') {
