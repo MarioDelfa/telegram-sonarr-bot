@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Copia') {
       steps {
-        ws(dir: '/opt/sonarrbot')
+        dir(path: '/opt/sonarrbot')
       }
     }
     stage('arranque del bot') {
