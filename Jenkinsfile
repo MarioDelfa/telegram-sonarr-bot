@@ -1,15 +1,9 @@
 pipeline {
   agent any
   stages {
-    stage('Inicializacion') {
-      agent any
+    stage('') {
       steps {
-        sh 'echo patata'
-      }
-    }
-    stage('arranque del bot') {
-      steps {
-        sh 'node sonarr.js'
+        echo 'Patata'
       }
     }
   }
