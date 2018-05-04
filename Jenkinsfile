@@ -18,15 +18,12 @@ cp -Rf * /opt/sonarrbot/'''
     }
     stage('Cambio WS') {
       steps {
-        dir(path: '/opt/sonarrbot/') {
-          sh 'npm install'
-        }
-
+        dir(path: '/opt/sonarrbot/')
       }
     }
     stage('Copia de configuracion') {
       steps {
-        sh 'cp /opt/sonarrbot/config/* /opt/sonarrbot/'
+        sh 'npm install'
       }
     }
   }
