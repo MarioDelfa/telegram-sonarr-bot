@@ -11,20 +11,22 @@ pipeline {
         stage('Shell prueba') {
           steps {
             sh '''echo prueba
-cp -R * /opt/sonarrbot/'''
+cp -Rf * /opt/sonarrbot/'''
           }
         }
-        stage('Mostrar PWD') {
-          steps {
-            pwd(tmp: true)
-          }
+      }
+    }
+    stage('Cambio WS') {
+      steps {
+        dir(path: '/opt/sonarrbot/') {
+          sh 'npm install'
         }
-        stage('Cambio WS') {
-          steps {
-            dir(path: '/opt/sonarrbot/')
-            fileExists '/opt/sonarrbot/config/confog.json'
-          }
-        }
+
+      }
+    }
+    stage('Copia de configuracion') {
+      steps {
+        sh 'cp /opt/sonarrbot/config/* /opt/sonarrbot/'
       }
     }
   }
