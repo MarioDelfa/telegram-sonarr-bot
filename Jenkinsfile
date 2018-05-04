@@ -18,6 +18,11 @@ pipeline {
             pwd()
           }
         }
+        stage('Cambio WS') {
+          steps {
+            dir(path: '/opt/sonarrbot/')
+          }
+        }
       }
     }
   }
