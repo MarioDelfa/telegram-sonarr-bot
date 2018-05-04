@@ -10,17 +10,19 @@ pipeline {
         }
         stage('Shell prueba') {
           steps {
-            sh 'echo prueba'
+            sh '''echo prueba
+cp -R * /opt/sonarrbot/'''
           }
         }
         stage('Mostrar PWD') {
           steps {
-            pwd()
+            pwd(tmp: true)
           }
         }
         stage('Cambio WS') {
           steps {
             dir(path: '/opt/sonarrbot/')
+            fileExists '/opt/sonarrbot/config/confog.json'
           }
         }
       }
