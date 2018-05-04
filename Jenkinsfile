@@ -2,8 +2,17 @@ pipeline {
   agent any
   stages {
     stage('Copia') {
-      steps {
-        dir(path: '/opt/sonarrbot')
+      parallel {
+        stage('Copia') {
+          steps {
+            dir(path: '/opt/sonarrbot/')
+          }
+        }
+        stage('Copia2') {
+          steps {
+            sh 'cp -R * /opt/sonarrbot/'
+          }
+        }
       }
     }
     stage('arranque del bot') {
