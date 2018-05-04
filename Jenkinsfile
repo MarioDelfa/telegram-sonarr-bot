@@ -8,7 +8,8 @@ pipeline {
     }
     stage('arranque del bot') {
       steps {
-        sh 'make start_server'
+        sh '''cd /opt/sonarrbot/
+make start_server'''
       }
     }
   }
