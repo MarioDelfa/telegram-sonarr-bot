@@ -10,6 +10,10 @@ pipeline {
       steps {
         sh '''cd /opt/sonarrbot/
 make start_server'''
+        dir(path: '/opt/sonarrbot/') {
+          sh 'make deploy'
+        }
+
       }
     }
   }
