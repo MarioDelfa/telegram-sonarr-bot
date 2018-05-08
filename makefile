@@ -27,10 +27,5 @@ status:
 	$(status)
 
 define  status =
-	if [ -f /opt/sonarrbot/lock/sonarr.pid ];
-	then
-		echo "patata";
-	else
-		echo "arenque";
-	fi
+	if [ -f /opt/sonarrbot/lock/sonarr.pid ]; then echo "El proceso esta en ejecución" ; exit 0; else echo "El proceso no esta en ejecución"; exit 1 ; fi
 endef
