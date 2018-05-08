@@ -9,7 +9,7 @@ pipeline {
     stage('arranque del bot') {
       steps {
         sh '''cd /opt/sonarrbot/
-make start_server'''
+make status'''
         dir(path: '/opt/sonarrbot/') {
           sh 'make deploy'
         }
