@@ -74,17 +74,6 @@ tlgfBot.start((ctx)=>{
     sendCommandsTlgf(fromId);
 });
 
-<<<<<<< HEAD
-
-tlgfBot.command('/auth', (ctx) => {
-  var fromId = ctx.from.id;
-  logger.info('[TRAZA]1 ' + ctx.match);
-  logger.info('[TRAZA]2 ' + ctx);
-  if ( ctx.match === undefined){
-    return replyWithError(fromId, new Error(i18n.__('errorInvalidPassowrd')));
-  }
-  var password = ctx.match[1];
-=======
 /*
  * handle authorization
  */
@@ -92,7 +81,6 @@ tlgfBot.command('auth', (ctx) => {
   var msg = ctx;
   var fromId = msg.from.id;
   var password = ctx.state.args;
->>>>>>> cbf8e71edb03b5c67299fcdd770a96b803a83263
 
   var message = [];
 
@@ -142,13 +130,9 @@ tlgfBot.command('help', (ctx) => {
   sendCommandsTlgf(fromId);
 });
 
-<<<<<<< HEAD
-
-=======
 /*
  * handle sonarr commands
  */
->>>>>>> cbf8e71edb03b5c67299fcdd770a96b803a83263
 tlgfBot.on('message',(ctx) => {
   var user    = ctx.from;
   var message = ctx.message;
