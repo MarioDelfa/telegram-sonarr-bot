@@ -67,7 +67,7 @@ tlgfBot.telegram.getMe().then(function(msg) {
 /*
  * handle start command
  */
-tlgfBot.command('start', (ctx)=>{
+tlgfBot.start((ctx)=>{
     var fromId = ctx.from.id;
 
     verifyUser(fromId);
@@ -77,48 +77,7 @@ tlgfBot.command('start', (ctx)=>{
     sendCommands(fromId);
 });
 
-/*
- * handle authorization
- */
-// bot.onText(/\/auth (.+)/, function(msg, match) {
-//   var fromId = msg.from.id;
-//   var password = match[1];
 
-//   var message = [];
-
-//   if (isAuthorized(fromId)) {
-//     message.push(i18n.__('botChatAuthAlreadyAuthorized_1'));
-//     message.push(i18n.__('botChatAuthAlreadyAuthorized_2'));
-//     return bot.sendMessage(fromId, message.join('\n'));
-//   }
-
-//   // make sure the user is not banned
-//   if (isRevoked(fromId)) {
-//     message.push(i18n.__('botChatAuthIsRevoked_1'));
-//     message.push(i18n.__('botChatAuthIsRevoked_2'));
-//     return bot.sendMessage(fromId, message.join('\n'));
-//   }
-
-//   if (password !== config.bot.password) {
-//     return replyWithError(fromId, new Error(i18n.__('errorInvalidPassowrd')));
-//   }
-
-//   acl.allowedUsers.push(msg.from);
-//   updateACL();
-
-//   if (acl.allowedUsers.length === 1) {
-//     promptOwnerConfig(fromId);
-//   }
-
-//   if (config.bot.owner) {
-//     bot.sendMessage(config.bot.owner, i18n.__('botChatAuthUserWasGranted', getTelegramName(msg.from)));
-//   }
-
-//   message.push(i18n.__('botChatAuthGranted_1'));
-//   message.push(i18n.__('botChatAuthGranted_2'));
-
-//   return bot.sendMessage(fromId, message.join('\n'));
-// });
 tlgfBot.command('/auth', (ctx) => {
   var fromId = ctx.from.id;
   logger.info('[TRAZA]1 ' + ctx.match);
@@ -189,143 +148,6 @@ tlgfBot.command('help', (ctx) => {
   sendCommands(fromId);
 });
 
-/*
- * handle sonarr commands
- */
-// bot.on('message', function(msg) {
-//   var user    = msg.from;
-//   var message = msg.text;
- 
-//   var sonarr = new SonarrMessage(bot, user, cache);
-
-//   if (/^\/library\s?(.+)?$/g.test(message)) {
-//     if(isAuthorized(user.id)){
-//        var searchText = /^\/library\s?(.+)?/g.exec(message)[1] || null;
-//        return sonarr.performLibrarySearch(searchText);
-//     } else {
-//        return replyWithError(user.id, new Error(i18n.__('notAuthorized')));
-//     }
-//   }
-
-//   if(/^\/rss$/g.test(message)) {
-//     verifyAdmin(user.id);
-//     if(isAdmin(user.id)){
-//       return sonarr.performRssSync();
-//     }  
-//   }
-
-//   if(/^\/wanted$/g.test(message)) {
-//     verifyAdmin(user.id);
-//     if(isAdmin(user.id)){
-//       return sonarr.performWantedSearch();
-//     }
-//   }
-
-//   if(/^\/refresh$/g.test(message)) {
-//     verifyAdmin(user.id);
-//     if(isAdmin(user.id)){
-//       return sonarr.performLibraryRefresh();
-//     }
-//   }
-
-//   if (/^\/upcoming\s?(\d+)?$/g.test(message)) {
-//     if(isAuthorized(user.id)){
-//       var futureDays = /^\/upcoming\s?(\d+)?/g.exec(message)[1] || 3;
-//       return sonarr.performCalendarSearch(futureDays);
-//     } else {
-//        return replyWithError(user.id, new Error(i18n.__('notAuthorized')));
-//     }
-//   }
-
-//   /*
-//    * /cid command
-//    * Gets the current chat id
-//    * Used for configuring notifications and similar tasks
-//    */
-//   if (/^\/cid$/g.test(message)) {
-//     verifyAdmin(user.id);
-//     logger.info(i18n.__('logUserCidCommand', user.id, msg.chat.id));
-//     return bot.sendMessage(msg.chat.id, i18n.__('botChatCid', msg.chat.id));
-//   }
-
-
-//   /*
-//    * /query command
-//    */
-//   if (/^\/[Qq](uery)? (.+)$/g.test(message)) {
-//     if(isAuthorized(user.id)){
-//        var seriesName = /^\/[Qq](uery)? (.+)/g.exec(message)[2] || null;
-//        return sonarr.sendSeriesList(seriesName);
-//     } else {
-//        return replyWithError(user.id, new Error(i18n.__('notAuthorized')));     
-//     }
-//   }
-
-//   // get the current cache state
-//   var currentState = cache.get('state' + user.id);
-
-//   if (currentState === state.admin.REVOKE) {
-//     verifyUser(user.id);
-//     return handleRevokeUser(user.id, message);
-//   }
-
-//   if (currentState === state.admin.REVOKE_CONFIRM) {
-//     verifyUser(user.id);
-//     return handleRevokeUserConfirm(user.id, message);
-//   }
-
-//   if (currentState === state.admin.UNREVOKE) {
-//     verifyUser(user.id);
-//     return handleUnRevokeUser(user.id, message);
-//   }
-
-//   if (currentState === state.admin.UNREVOKE_CONFIRM) {
-//     verifyUser(user.id);
-//     return handleUnRevokeUserConfirm(user.id, message);
-//   }
-
-//   if (currentState === state.sonarr.CONFIRM) {
-//     verifyUser(user.id);
-//     logger.info(i18n.__('botChatQuerySeriesConfirm', user.id, message));
-//     return sonarr.confirmShowSelect(message);
-//   }
-
-//   if (currentState === state.sonarr.PROFILE) {
-//     verifyUser(user.id);
-//     logger.info(i18n.__('botChatQuerySeriesChoose', user.id, message));
-//     return sonarr.sendProfileList(message);
-//   }
-
-//   if (currentState === state.sonarr.MONITOR) {
-//     verifyUser(user.id);
-//     logger.info(i18n.__('botChatQueryProfileChoose', user.id, message));
-//     return sonarr.sendMonitorList(message);
-//   }
-
-//   if (currentState === state.sonarr.TYPE) {
-//     verifyUser(user.id);
-//     logger.info(i18n.__('botChatQueryTypeChoose', user.id, message));
-//     return sonarr.sendTypeList(message);
-//   }
-
-//   if (currentState === state.sonarr.FOLDER) {
-//     verifyUser(user.id);
-//     logger.info(i18n.__('botChatQueryFolderChoose', user.id, message));
-//     return sonarr.sendFolderList(message);
-//   }
-
-//   if (currentState === state.sonarr.SEASON_FOLDER) {
-//     verifyUser(user.id);
-//     logger.info(i18n.__('botChatQuerySeasonFolderChoose', user.id, message));
-//     return sonarr.sendSeasonFolderList(message);
-//   }
-
-//   if (currentState === state.sonarr.ADD_SERIES) {
-//     verifyUser(user.id);
-//     return sonarr.sendAddSeries(message);
-//   }
-
-// });
 
 tlgfBot.on('message',(ctx) => {
   var user    = ctx.from;
