@@ -24,13 +24,13 @@ PATH_PID = /opt/sonarrbot/lock/sonarr.pid
 #         endif
 .PHONY: status
 status:
-    $(status)
+	$(status)
 
 define  status =
-    if [ -f /opt/sonarrbot/lock/sonarr.pid ];
-    then
-        echo "patata";
-    else
-        echo "arenque";
-    fi
+	if [ -f /opt/sonarrbot/lock/sonarr.pid ];
+	then
+		echo "patata";
+	else
+		echo "arenque";
+	fi
 endef
