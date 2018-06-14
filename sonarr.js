@@ -10,8 +10,8 @@ const TelegrafBot = require('telegraf');                // https://github.com/te
 const commandParts = require('telegraf-command-parts'); // https://github.com/telegraf/telegraf
 
 /*
- * libs
- */
+* libs
+*/
 var i18n   = require(__dirname + '/lib/lang');          // set up multilingual support
 const TelegrafI18n = require('telegraf-i18n');          // https://github.com/telegraf/telegraf-i18n
 var config = require(__dirname + '/lib/config');        // the concised configuration
